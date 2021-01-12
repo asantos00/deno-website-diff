@@ -1,9 +1,7 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-buster
 
-ENV DENO_VERSION=v1.6.3
+ENV DENO_VERSION=v1.6.0
 ENV DENO_INSTALL=/deno
-ENV PUPPETEER_PRODUCT=chrome
-ENV PUPPETEER_CHROMIUM_REVISION=818858
 
 RUN mkdir -p /deno \
     && curl -fsSL https://deno.land/x/install/install.sh -o install-deno.sh \
@@ -15,8 +13,10 @@ ENV PATH=${DENO_INSTALL}/bin:${PATH} \
     DENO_DIR=${DENO_INSTALL}/.cache/deno
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-   && apt-get -y install --no-install-recommends make
-
-# Install Chromium through Puppeteer
-RUN deno run -A --unstable https://deno.land/x/puppeteer@5.5.1/install.ts
-ENV PUPPETEER_EXECUTABLE_PATH=/deno/.cache/deno/deno_puppeteer/chromium/linux-${PUPPETEER_CHROMIUM_REVISION}/chrome-linux/chrome
+    && apt-get install -y wget gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+      make ca-certificates --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
