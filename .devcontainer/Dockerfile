@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-buster
 
-ENV DENO_VERSION=1.6.3
+ENV DENO_VERSION=v1.6.3
 ENV DENO_INSTALL=/deno
 RUN mkdir -p /deno \
     && curl -fsSL https://deno.land/x/install/install.sh -o install-deno.sh \
