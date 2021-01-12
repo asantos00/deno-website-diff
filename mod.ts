@@ -66,7 +66,8 @@ async function getPdf(
 
   const diff = new PNG(viewPort);
 
-  const screenshotPath = `./screenshots/${domain}-${name}.png`;
+  const screenshotBasePath = Deno.env.get("WEB_RES_SCREENSHOT_BASE_PATH");
+  const screenshotPath = `${screenshotBasePath}/${domain}-${name}.png`;
   const screenshot = await page.screenshot({ path: screenshotPath });
 
   if (!isWrite) {
@@ -88,7 +89,7 @@ async function getPdf(
     //@ts-ignore
     const buffer = PNG.sync.write(diff);
     await Deno.writeFile(
-      `./screenshots/diff-${domain}-${name}.png`,
+      `${screenshotBasePath}/diff-${domain}-${name}.png`,
       buffer,
       { create: true },
     );
