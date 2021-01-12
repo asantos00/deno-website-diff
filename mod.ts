@@ -52,6 +52,7 @@ async function getPdf(
 ) {
   const browser = await puppeteer.launch({
     defaultViewport: viewPort,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
   await page.goto(website, {
