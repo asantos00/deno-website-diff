@@ -6,7 +6,10 @@
 
     // Set *default* container specific settings.json values on container create.
     "settings": { 
-        "terminal.integrated.shell.linux": "/bin/bash"
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "deno.enable": true,
+        "deno.unstable": true,
+        "deno.lint": true
     },
 
     // Add the IDs of extensions you want installed when the container is created.
@@ -14,7 +17,7 @@
         "ms-azuretools.vscode-docker",
         "denoland.vscode-deno",
         "ms-vscode.vscode-typescript-tslint-plugin",
-        "esbenp.prettier-vscode",
+        "esbenp.prettier-vscode"
     ],
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.

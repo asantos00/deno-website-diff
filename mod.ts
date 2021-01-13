@@ -1,6 +1,9 @@
 import { parse } from "https://deno.land/std@0.83.0/flags/mod.ts";
 
 import puppeteer from "https://deno.land/x/puppeteer@5.5.1/mod.ts";
+import { config } from "https://deno.land/x/dotenv/mod.ts";
+import "https://deno.land/x/dotenv/load.ts";
+import { ensureDir } from "https://deno.land/std@0.83.0/fs/ensure_dir.ts";
 import pixelmatch from "https://jspm.dev/pixelmatch";
 import { PNG } from "https://jspm.dev/pngjs";
 
@@ -33,7 +36,7 @@ const resolutions: Record<Resolutions, Resolution> = {
 
 const args = parse(Deno.args);
 const website = args._[0] as string;
-const isWrite = args.write;
+const isDiff = args.diff;
 
 if (!website) {
   throw new Error("You need to provide a website to get pdfs from");
@@ -65,17 +68,16 @@ async function getPdf(
 
   await page.waitForTimeout(5000);
 
-  const diff = new PNG(viewPort);
-
   const screenshotBasePath = Deno.env.get("WEB_RES_SCREENSHOT_BASE_PATH");
+  await ensureDir(screenshotBasePath);
+
   const screenshotPath = `${screenshotBasePath}/${domain}-${name}.png`;
   const screenshot = await page.screenshot({ path: screenshotPath });
 
-  if (!isWrite) {
-    const screenshot = await page.screenshot();
+  if (isDiff) {
     const newImage = await parsePNG(screenshot as Uint8Array);
-
     const oldImage = await parsePNG(await Deno.readFile(screenshotPath));
+    const diff = new PNG(viewPort);
 
     //@ts-ignore
     pixelmatch(
