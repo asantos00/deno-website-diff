@@ -1,7 +1,6 @@
 import { parse } from "https://deno.land/std@0.83.0/flags/mod.ts";
 
 import puppeteer from "https://deno.land/x/puppeteer@5.5.1/mod.ts";
-import { config } from "https://deno.land/x/dotenv/mod.ts";
 import "https://deno.land/x/dotenv/load.ts";
 import { ensureDir } from "https://deno.land/std@0.83.0/fs/ensure_dir.ts";
 import pixelmatch from "https://jspm.dev/pixelmatch";
