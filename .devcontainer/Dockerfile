@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-buster
 
-ENV DENO_VERSION=v1.6.0
+ENV DENO_VERSION=v1.6.3
 ENV DENO_INSTALL=/deno
 
 RUN mkdir -p /deno \
