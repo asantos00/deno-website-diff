@@ -45,7 +45,6 @@ if (!website) {
 Object.keys(Resolutions).forEach(async (name) => {
   // @ts-ignore
   const { height, width } = resolutions[name] as Resolution;
-
   await getPdf(name, { height, width });
 });
 
@@ -55,48 +54,51 @@ async function getPdf(
 ) {
   const browser = await puppeteer.launch({
     defaultViewport: viewPort,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--no-zygote', '--single-process'],
   });
-  const page = await browser.newPage();
-  await page.goto(website, {
-    waitUntil: "networkidle2",
-  });
+  try {
+    const page = await browser.newPage();
+    await page.goto(website, {
+      waitUntil: "networkidle2",
+    });
 
-  console.log(`Getting screenshot for ${website} on ${name}`);
+    console.log(`Getting screenshot for ${website} on ${name}`);
 
-  const [domain] = website.replace(/(^\w+:|^)\/\//, "").split(".");
+    const [domain] = website.replace(/(^\w+:|^)\/\//, "").split(".");
 
-  await page.waitForTimeout(5000);
+    const screenshotBasePath = Deno.env.get("WEB_RES_SCREENSHOT_BASE_PATH");
+    await ensureDir(screenshotBasePath || "./");
 
-  const screenshotBasePath = Deno.env.get("WEB_RES_SCREENSHOT_BASE_PATH");
-  await ensureDir(screenshotBasePath);
+    const screenshotPath = `${screenshotBasePath}/${domain}-${name}.png`;
+    const screenshot = await page.screenshot({ path: screenshotPath });
 
-  const screenshotPath = `${screenshotBasePath}/${domain}-${name}.png`;
-  const screenshot = await page.screenshot({ path: screenshotPath });
+    if (isDiff) {
+      const newImage = await parsePNG(screenshot as Uint8Array);
+      const oldImage = await parsePNG(await Deno.readFile(screenshotPath));
+      const diff = new PNG(viewPort);
 
-  if (isDiff) {
-    const newImage = await parsePNG(screenshot as Uint8Array);
-    const oldImage = await parsePNG(await Deno.readFile(screenshotPath));
-    const diff = new PNG(viewPort);
+      //@ts-ignore
+      pixelmatch(
+        newImage.data,
+        oldImage.data,
+        diff.data,
+        viewPort.width,
+        viewPort.height,
+        { threshold: 0.5 },
+      );
 
-    //@ts-ignore
-    pixelmatch(
-      newImage.data,
-      oldImage.data,
-      diff.data,
-      viewPort.width,
-      viewPort.height,
-      { threshold: 0.5 },
-    );
-
-    //@ts-ignore
-    const buffer = PNG.sync.write(diff);
-    await Deno.writeFile(
-      `${screenshotBasePath}/diff-${domain}-${name}.png`,
-      buffer,
-      { create: true },
-    );
+      //@ts-ignore
+      const buffer = PNG.sync.write(diff);
+      await Deno.writeFile(
+        `${screenshotBasePath}/diff-${domain}-${name}.png`,
+        buffer,
+        { create: true },
+      );
+    }
+  } catch(e) {
+    console.log(e)
   }
-
-  await browser.close();
+  finally {
+    await browser.close()
+  }
 }
