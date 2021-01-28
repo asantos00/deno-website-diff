@@ -1,6 +1,6 @@
-# Deno Website Resolutions
+# Deno Website Diff
 
-A Deno util that uses puppeteer to get screenshots of a website in different resolutions
+A Deno util that uses puppeteer to get screenshots of a website in different resolutions and check them for visual changes
 
 # Running it
 
