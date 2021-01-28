@@ -39,11 +39,11 @@ async function analyseWebsite(
   website: string,
   name: string,
   viewPort: { width: number; height: number },
-  isDiff: boolean
+  isDiff: boolean,
 ) {
   const browser = await puppeteer.launch({
     defaultViewport: viewPort,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   try {
     const page = await browser.newPage();
@@ -83,15 +83,13 @@ async function analyseWebsite(
         buffer,
         { create: true },
       );
-    }
-    else {
+    } else {
       await page.screenshot({ path: screenshotPath });
     }
-  } catch(e) {
-    console.log(e)
-  }
-  finally {
-    await browser.close()
+  } catch (e) {
+    console.log(e);
+  } finally {
+    await browser.close();
   }
 }
 
